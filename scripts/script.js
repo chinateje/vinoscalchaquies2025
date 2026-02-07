@@ -9,6 +9,21 @@ const vinos = [
 let carrito = [];
 let usuarioLogueado = null;
 
+// -------------------------------
+// Guardado y carga del carrito
+// -------------------------------
+function guardarCarrito() {
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+function cargarCarrito() {
+  const data = localStorage.getItem("carrito");
+  if (data) carrito = JSON.parse(data);
+}
+
+// -------------------------------
+// Login
+// -------------------------------
 function mostrarLogin() {
   contenedor.innerHTML = `
     <h2>Ingreso a la tienda</h2>
@@ -17,9 +32,7 @@ function mostrarLogin() {
     <p id="mensaje-login"></p>
   `;
 
-  document
-    .getElementById("btn-login")
-    .addEventListener("click", loginLibre);
+  document.getElementById("btn-login").addEventListener("click", loginLibre);
 }
 
 function loginLibre() {
@@ -31,24 +44,23 @@ function loginLibre() {
     return;
   }
 
-  usuarioLogueado = {
-    email: email,
-    rol: "cliente"
-  };
-
+  usuarioLogueado = { email: email, rol: "cliente" };
   iniciarSimulador();
 }
 
-
+// -------------------------------
+// Contenedor principal
+// -------------------------------
 const botonIniciar = document.getElementById("iniciar-validacion");
 const contenedor = document.getElementById("contenido-js");
-
 
 if (!mostrarResumenGuardado()) {
   botonIniciar.addEventListener("click", mostrarLogin);
 }
 
-
+// -------------------------------
+// Iniciar simulador
+// -------------------------------
 function iniciarSimulador() {
   contenedor.innerHTML = `
     <h2>Catálogo de vinos</h2>
@@ -56,13 +68,15 @@ function iniciarSimulador() {
   `;
 
   mostrarVinos();
+  cargarCarrito();      // <-- Cargar carrito guardado
   mostrarCarrito();
   mostrarTotal();
   mostrarOpcionesDePago();
 }
 
-
-
+// -------------------------------
+// Mostrar vinos
+// -------------------------------
 function mostrarVinos() {
   const lista = document.createElement("div");
 
@@ -81,20 +95,15 @@ function mostrarVinos() {
   contenedor.appendChild(lista);
 }
 
-
-
+// -------------------------------
+// Agregar, aumentar y disminuir
+// -------------------------------
 function agregarVino(vino) {
   const vinoExistente = carrito.find(item => item.id === vino.id);
+  if (vinoExistente) vinoExistente.cantidad++;
+  else carrito.push({ ...vino, cantidad: 1 });
 
-  if (vinoExistente) {
-    vinoExistente.cantidad++;
-  } else {
-    carrito.push({
-      ...vino,
-      cantidad: 1
-    });
-  }
-
+  guardarCarrito();   // <-- Guardar cambios
   mostrarCarrito();
   mostrarTotal();
 }
@@ -102,23 +111,24 @@ function agregarVino(vino) {
 function aumentarCantidad(id) {
   const item = carrito.find(vino => vino.id === id);
   item.cantidad++;
+  guardarCarrito();   // <-- Guardar cambios
   mostrarCarrito();
   mostrarTotal();
 }
 
 function disminuirCantidad(id) {
   const item = carrito.find(vino => vino.id === id);
+  if (item.cantidad > 1) item.cantidad--;
+  else carrito = carrito.filter(vino => vino.id !== id);
 
-  if (item.cantidad > 1) {
-    item.cantidad--;
-  } else {
-    carrito = carrito.filter(vino => vino.id !== id);
-  }
-
+  guardarCarrito();   // <-- Guardar cambios
   mostrarCarrito();
   mostrarTotal();
 }
 
+// -------------------------------
+// Mostrar carrito (fijo a la derecha)
+// -------------------------------
 function mostrarCarrito() {
   let carritoHTML = document.getElementById("carrito");
 
@@ -138,18 +148,18 @@ function mostrarCarrito() {
   carrito.forEach(item => {
     const div = document.createElement("div");
     div.innerHTML = `
-  <strong>${item.nombre}</strong> - $${item.precio * item.cantidad}
-  <button onclick="disminuirCantidad(${item.id})">−</button>
-  <span> ${item.cantidad} </span>
-  <button onclick="aumentarCantidad(${item.id})">+</button>
-`;
-
+      <strong>${item.nombre}</strong> - $${item.precio * item.cantidad}
+      <button onclick="disminuirCantidad(${item.id})">−</button>
+      <span> ${item.cantidad} </span>
+      <button onclick="aumentarCantidad(${item.id})">+</button>
+    `;
     carritoHTML.appendChild(div);
   });
 }
 
-
-
+// -------------------------------
+// Mostrar total
+// -------------------------------
 function mostrarTotal() {
   let totalHTML = document.getElementById("total");
 
@@ -159,18 +169,13 @@ function mostrarTotal() {
     contenedor.appendChild(totalHTML);
   }
 
-  const total = carrito.reduce(
-    (acc, item) => acc + item.precio * item.cantidad,
-    0
-  );
-
+  const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
   totalHTML.textContent = `Total actual: $${total}`;
 }
 
 // -------------------------------
-// Opciones de pago MOOR
+// Opciones de pago
 // -------------------------------
-
 function mostrarOpcionesDePago() {
   const seccionPago = document.createElement("div");
   seccionPago.innerHTML = `<h3>Método de pago</h3>`;
@@ -189,40 +194,35 @@ function mostrarOpcionesDePago() {
   contenedor.appendChild(seccionPago);
 }
 
-
-
+// -------------------------------
+// Pago
+// -------------------------------
 function pagarConTransferencia() {
-  if (carrito.length === 0) {
-    mostrarMensaje("No seleccionaste ningún vino.");
-    return;
-  }
-
+  if (carrito.length === 0) return mostrarMensaje("No seleccionaste ningún vino.");
   const total = calcularTotal();
   const totalConDescuento = total - total * DESCUENTO_TRANSFERENCIA;
-
   finalizarCompra(`Pago con transferencia aplicado (15% OFF). Total: $${totalConDescuento}`);
 }
 
 function pagarConTarjeta() {
-  if (carrito.length === 0) {
-    mostrarMensaje("No seleccionaste ningún vino.");
-    return;
-  }
-
+  if (carrito.length === 0) return mostrarMensaje("No seleccionaste ningún vino.");
   finalizarCompra(`Pago con tarjeta seleccionado. Total: $${calcularTotal()}`);
 }
 
-
-
+// -------------------------------
+// Total calculado
+// -------------------------------
 function calcularTotal() {
-  return carrito.reduce(
-    (acc, item) => acc + item.precio * item.cantidad,
-    0
-  );
+  return carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 }
-function finalizarCompra(mensaje) {
-     localStorage.setItem("resumenCompra", mensaje);
 
+// -------------------------------
+// Finalizar compra
+// -------------------------------
+function finalizarCompra(mensaje) {
+  localStorage.setItem("resumenCompra", mensaje);
+  localStorage.removeItem("carrito");  // <-- Limpiar carrito al finalizar
+  carrito = [];
 
   contenedor.innerHTML = `
     <h2>Resumen de compra</h2>
@@ -231,22 +231,24 @@ function finalizarCompra(mensaje) {
     <button id="btn-logout">Salir</button>
   `;
 
-  carrito = [];
-
-  document
-    .getElementById("btn-logout")
-    .addEventListener("click", () => {
-      usuarioLogueado = null;
-      mostrarLogin();
-    });
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    usuarioLogueado = null;
+    mostrarLogin();
+  });
 }
 
-
+// -------------------------------
+// Mensajes
+// -------------------------------
 function mostrarMensaje(texto) {
   const mensaje = document.createElement("p");
   mensaje.textContent = texto;
   contenedor.appendChild(mensaje);
 }
+
+// -------------------------------
+// Resumen guardado
+// -------------------------------
 function mostrarResumenGuardado() {
   const resumen = localStorage.getItem("resumenCompra");
 

@@ -32,3 +32,25 @@ button {
 button:hover {
     background-color: #b30000;
 }
+#carrito {
+  position: fixed;
+  right: 20px;
+  top: 80px; /* ajustá según tu header */
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+#total {
+  font-weight: bold;
+  margin-top: 10px;
+}
+#carrito div {
+  margin-bottom: 8px;
+}
+#carrito button {
+  margin: 0 2px;
+}
