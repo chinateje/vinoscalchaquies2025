@@ -3,22 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validación de Cliente - Página de Vinos</title>
+    <title>Simulador de Vinos Calchaquíes</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2, h3 { color: #7B1E29; }
+        button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+        div { margin-bottom: 10px; }
+        #contenido-js p, #contenido-js div { margin: 5px 0; }
+    </style>
 </head>
 
-<div class="head">
-    <img src="../imagenes/logo-vinos-calchaquies.png" id="logo" alt="Logo de Vinos Calchaquíes">
 <body>
+
+    <div class="head">
+        <img src="../imagenes/logo-vinos-calchaquies.png" id="logo" alt="Logo de Vinos Calchaquíes" width="200">
+    </div>
+
     <header>
-        <h1>Página de Vinos Calchaquies </h1>
+        <h1>Tienda de Vinos Calchaquíes</h1>
     </header>
+
     <main>
         <section>
-            <p>El objetivo de este trabajo es validar los datos de clientes interesados en ingresar a nuestra página de vinos. Para proceder, el cliente debe ser mayor de 18 años, residir en Argentina y ser de una de las siguientes ciudades: Buenos Aires, La Plata o Quilmes.</p>
+            <p>
+                Bienvenido al simulador de compra de vinos. Seleccioná tus vinos favoritos,
+                calculá el total de la compra y aplicá descuentos según el método de pago.
+            </p>
             <button id="iniciar-validacion">Comenzar Validación</button>
         </section>
+
+        <section id="contenido-js"></section>
     </main>
+
+    <!-- JS MOOOR <3 -->
     <script src="scripts/script.js"></script>
 </body>
 </html>
